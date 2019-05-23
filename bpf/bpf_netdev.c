@@ -388,6 +388,10 @@ static inline int handle_ipv4(struct __sk_buff *skb, __u32 src_identity)
 	secctx = derive_ipv4_sec_ctx(skb, ip4);
 	tuple.nexthdr = ip4->protocol;
 
+	//debugging
+	cilium_dbg3(skb, DBG_IP_ID_MAP_SUCCEED4, ip4->saddr, src_identity, 1);
+	cilium_dbg3(skb, DBG_IP_ID_MAP_SUCCEED4, ip4->saddr, secctx, 2);
+
 	/* Packets from the proxy will already have a real identity. */
 	if (identity_is_reserved(src_identity)) {
 		info = ipcache_lookup4(&IPCACHE_MAP, ip4->saddr, V4_CACHE_KEY_LEN);
@@ -408,11 +412,13 @@ static inline int handle_ipv4(struct __sk_buff *skb, __u32 src_identity)
 					src_identity = sec_label;
 			}
 		}
-		cilium_dbg(skb, info ? DBG_IP_ID_MAP_SUCCEED4 : DBG_IP_ID_MAP_FAILED4,
-			   ip4->saddr, src_identity);
+		cilium_dbg3(skb, info ? DBG_IP_ID_MAP_SUCCEED4 : DBG_IP_ID_MAP_FAILED4,
+			    ip4->saddr, src_identity, 3);
 	}
 
+	//debugging
 	secctx = finalize_sec_ctx(secctx, src_identity);
+	cilium_dbg3(skb, DBG_IP_ID_MAP_SUCCEED4, ip4->saddr, secctx, 4);
 #ifdef FROM_HOST
 	if (1) {
 		int ret;
@@ -422,6 +428,8 @@ static inline int handle_ipv4(struct __sk_buff *skb, __u32 src_identity)
 		/* DIRECT PACKET READ INVALID */
 		if (IS_ERR(ret))
 			return ret;
+		//debugging
+		cilium_dbg3(skb, DBG_IP_ID_MAP_SUCCEED4, 0, 0, 5);
 
 		/* If we are attached to cilium_host at egress, this will
 		 * rewrite the destination mac address to the MAC of cilium_net */

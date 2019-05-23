@@ -353,7 +353,7 @@ func (n *DebugMsg) subTypeString() string {
 	case DbgIPIDMapFailed6:
 		return fmt.Sprintf("Failed to map daddr.p4=[::%s] to identity", ip6Str(n.Arg1))
 	case DbgIPIDMapSucceed4:
-		return fmt.Sprintf("Successfully mapped daddr=%s to identity=%d", ip4Str(n.Arg1), n.Arg2)
+		return fmt.Sprintf("Successfully mapped daddr=%s to identity=%d (arg3: %d)", ip4Str(n.Arg1), n.Arg2, n.Arg3)
 	case DbgIPIDMapSucceed6:
 		return fmt.Sprintf("Successfully mapped daddr.p4=[::%s] to identity=%d", ip6Str(n.Arg1), n.Arg2)
 	case DbgLbStaleCT:
