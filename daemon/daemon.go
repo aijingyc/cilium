@@ -627,10 +627,14 @@ func (d *Daemon) initMaps() error {
 
 	// Set up the list of IPCache listeners in the daemon, to be
 	// used by syncLXCMap().
-	ipcache.IPIdentityCache.SetListeners([]ipcache.IPIdentityMappingListener{
-		&envoy.NetworkPolicyHostsCache,
-		bpfIPCache.NewListener(d),
-	})
+	listeners := []ipcache.IPIdentityMappingListener{bpfIPCache.NewListener(d)}
+
+	// Only add Envoy if LPM ipcache is not available.
+	if !ipcachemap.BackedByLPM() {
+		listeners = append(listeners, &envoy.NetworkPolicyHostsCache)
+	}
+
+	ipcache.IPIdentityCache.SetListeners(listeners)
 
 	// Insert local host entries to bpf maps
 	if err := d.syncLXCMap(); err != nil {
